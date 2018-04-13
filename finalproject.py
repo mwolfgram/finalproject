@@ -201,6 +201,7 @@ def get_data_for_model(): #add (make, model): as params
                     CREATE TABLE 'mobile' (
                         'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
                         'brand' TEXT NOT NULL,
+                        'brandfkey' INTEGER NOT NULL,
                         'model' TEXT NOT NULL,
                         'screensize' TEXT NOT NULL,
                         'rear camera (megapixels)' INTEGER NOT NULL,
@@ -225,6 +226,7 @@ def get_data_for_model(): #add (make, model): as params
                 CREATE TABLE 'mobile' (
                     'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
                     'brand' TEXT NOT NULL,
+                    'brandfkey' INTEGER NOT NULL,
                     'model' TEXT NOT NULL,
                     'screensize' TEXT NOT NULL,
                     'rear camera (megapixels)' INTEGER NOT NULL,
@@ -239,20 +241,24 @@ def get_data_for_model(): #add (make, model): as params
                     'screen-body ratio' INTEGER
                 );
             '''
-
-
             cur.execute(statement)
             conn.commit()
 
+        brand_mapping = {}
+        accum = 1
         for brand in super_master_dict.keys():
-            brand_name = brand
+            id = accum
+            brand_name = brand      #add table here that creates fkey reference table!!
+            brand_mapping[brand_name] = id
+            accum += 1
             #print(brand_name)
-            for phone in super_master_dict[brand_name].keys():
-                print(brand_name, phone, super_master_dict[brand_name][phone]) #fourteen things total! tuple has 11
 
+            for phone in super_master_dict[brand_name].keys():
+                #print(brand_name, phone, super_master_dict[brand_name][phone]) #fourteen things total! tuple has 11
 
                 zero = None
                 one = brand_name
+                brand_fkey = brand_mapping[brand_name]
                 two =  phone
                 three = super_master_dict[brand_name][phone][0]
                 four = super_master_dict[brand_name][phone][1]
@@ -266,11 +272,56 @@ def get_data_for_model(): #add (make, model): as params
                 twelve = super_master_dict[brand_name][phone][9]
                 thirteen = super_master_dict[brand_name][phone][10]
 
-                insertion = (zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen)
+                insertion = (zero, one, brand_fkey, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen)
                 statement = 'INSERT OR IGNORE INTO "mobile"'
-                statement += 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                statement += 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
                 cur.execute(statement, insertion)
                 conn.commit()
+
+        statement1 = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'foreign keys';"
+        table_exists = cur.execute(statement1).fetchall()[0][0]
+        if table_exists == 1:
+            #user_input = input('this table already exists -- reset it by typing yes to and start fresh?')
+            user_input = 'yes'
+            if user_input == 'yes':
+                statement1 = '''
+                    DROP TABLE IF EXISTS 'foreign keys';
+                '''
+                cur.execute(statement1)
+                conn.commit()
+
+                statement1 = '''
+                    CREATE TABLE 'foreign keys' (
+                        'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+                        'brand' TEXT NOT NULL
+                    );
+                '''
+                cur.execute(statement1)
+                conn.commit()
+
+            else:
+                return
+        else:
+            statement1 = '''
+                CREATE TABLE 'foreign keys' (
+                    'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+                    'brand' TEXT NOT NULL
+                );
+            '''
+
+
+        cur.execute(statement1)
+        conn.commit()
+        for x in brand_mapping.keys():
+            zero_one = None
+            one_one = x
+            insertion1 = (zero_one, one_one)
+            statement1 = 'INSERT OR IGNORE INTO "foreign keys"'
+            statement1 += 'VALUES (?, ?)'
+            cur.execute(statement1, insertion1)
+            conn.commit()
+
+
 
 get_data_for_model()
 
