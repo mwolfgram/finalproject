@@ -2,6 +2,8 @@ import sqlite3
 import requests
 import json
 from bs4 import BeautifulSoup
+import plotly.plotly as py
+import plotly.graph_objs as go
 
 brand_input_dict = {}
 
@@ -89,7 +91,6 @@ def get_data_for_model(): #add (make, model): as params
                     printStr2 += "{0:18}\t".format(x)
                     numsInRow2 += 1
             #print(printStr2)
-
             #extract info from one phone model (iphone 6s) for now, the cycle through the for loop with each phone from the model
 
             master_dict= {}
@@ -309,7 +310,6 @@ def get_data_for_model(): #add (make, model): as params
                 );
             '''
 
-
         cur.execute(statement1)
         conn.commit()
         for x in brand_mapping.keys():
@@ -322,8 +322,70 @@ def get_data_for_model(): #add (make, model): as params
             conn.commit()
 
 
+#get_data_for_model()
 
-get_data_for_model()
+
+def process_command():   #add a param in later -- command!!
+    DB_NAME = 'mobile.db'
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cur = conn.cursor()
+    except Error as e:
+        print(e)
+
+    query = "SELECT * FROM mobile"
+    cur.execute(query)
+
+    basicphone ='''
+    SELECT mobile.brand, AVG(`ram size`)
+    FROM mobile
+	JOIN `foreign keys`
+	   ON `foreign keys`.Id = brandfkey
+    GROUP BY mobile.brand
+    ORDER BY AVG(`ram size`) DESC
+    '''  #put the .format here eventually
+
+    strphone=str(basicphone)
+    cur.execute(strphone)
+    plotlytuplist = []
+    for row in cur:
+        pair = (row[0], (int(row[1])) if int(row[1]) > 5 else round(float(row[1]), 1))
+        plotlytuplist.append(pair)
+    print(plotlytuplist)
+
+
+    trace1 = go.Scatter(  #lmao figure out what this does in documentation
+        type='scatter',
+        x=[x[0] for x in plotlytuplist],
+        y=[x[1] for x in plotlytuplist],
+        marker=dict(
+            color='purple',
+            size=10
+        ),
+        line=dict(
+            color='rgb(230,230,230)',
+            width=4
+        ),
+        mode='markers+lines'
+    )
+    data = [trace1]
+
+    layout = go.Layout(
+        title="phone stuff",
+        xaxis = dict(
+            range=len(plotlytuplist)
+        ),
+        yaxis = dict(
+            range=[0, 10]
+        ),
+        height=500,
+        width=1000
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    py.plot(fig, filename = 'phone-line')
+process_command()
+#plotly stuff??
 
 
 
