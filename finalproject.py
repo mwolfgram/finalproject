@@ -4,6 +4,7 @@ import json
 from bs4 import BeautifulSoup
 import plotly.plotly as py
 import plotly.graph_objs as go
+import random
 
 brand_input_dict = {}
 
@@ -202,7 +203,7 @@ def get_data_for_model(): #add (make, model): as params
                     CREATE TABLE 'mobile' (
                         'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
                         'brand' TEXT NOT NULL,
-                        'brandfkey' INTEGER NOT NULL,
+                        'brandId' INTEGER NOT NULL,
                         'model' TEXT NOT NULL,
                         'screensize' TEXT NOT NULL,
                         'rear camera (megapixels)' INTEGER NOT NULL,
@@ -227,7 +228,7 @@ def get_data_for_model(): #add (make, model): as params
                 CREATE TABLE 'mobile' (
                     'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
                     'brand' TEXT NOT NULL,
-                    'brandfkey' INTEGER NOT NULL,
+                    'brandId' INTEGER NOT NULL,
                     'model' TEXT NOT NULL,
                     'screensize' TEXT NOT NULL,
                     'rear camera (megapixels)' INTEGER NOT NULL,
@@ -310,8 +311,9 @@ def get_data_for_model(): #add (make, model): as params
                 );
             '''
 
-        cur.execute(statement1)
+            cur.execute(statement1)
         conn.commit()
+
         for x in brand_mapping.keys():
             zero_one = None
             one_one = x
@@ -333,16 +335,34 @@ def process_command():   #add a param in later -- command!!
     except Error as e:
         print(e)
 
-    query = "SELECT * FROM mobile"
+    query = "SELECT * FROM mobile"   #mobile is the same name as mobile.db -- be careful here!!
     cur.execute(query)
 
+    # basicphone ='''
+    # SELECT mobile.brand, AVG(`ram size`)
+    # FROM mobile
+	# JOIN `foreign keys`
+	#    ON `foreign keys`.Id = brandfkey
+    # GROUP BY mobile.brand
+    # ORDER BY AVG(`ram size`) DESC
+    # '''  #put the .format here eventually
+
+    # #this changes what is displayed!!
+    # basicphone ='''
+    # SELECT mobile.model, `ram size`
+    # FROM mobile
+	# JOIN `foreign keys`
+	# ON `foreign keys`.Id = brandId
+    # ORDER BY `ram size` DESC
+    # '''  #put the .format here eventually
+
+    #this changes what is displayed!!
     basicphone ='''
-    SELECT mobile.brand, AVG(`ram size`)
+    SELECT mobile.model, `pixel density (ppi)`
     FROM mobile
 	JOIN `foreign keys`
-	   ON `foreign keys`.Id = brandfkey
-    GROUP BY mobile.brand
-    ORDER BY AVG(`ram size`) DESC
+	ON `foreign keys`.Id = brandId
+    --ORDER BY `pixel density (ppi)` DESC
     '''  #put the .format here eventually
 
     strphone=str(basicphone)
@@ -354,16 +374,16 @@ def process_command():   #add a param in later -- command!!
     print(plotlytuplist)
 
 
-    trace1 = go.Scatter(  #lmao figure out what this does in documentation
+    trace1 = go.Scatter(  #***THIS IS THE SCATTER FOR PIXEL DENSITY BC EVERYTHING IS HUGE***
         type='scatter',
         x=[x[0] for x in plotlytuplist],
         y=[x[1] for x in plotlytuplist],
         marker=dict(
-            color='purple',
+            color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
             size=10
         ),
         line=dict(
-            color='rgb(230,230,230)',
+            color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
             width=4
         ),
         mode='markers+lines'
@@ -376,7 +396,7 @@ def process_command():   #add a param in later -- command!!
             range=len(plotlytuplist)
         ),
         yaxis = dict(
-            range=[0, 10]
+            range=[165, 538]
         ),
         height=500,
         width=1000
@@ -384,6 +404,68 @@ def process_command():   #add a param in later -- command!!
 
     fig = go.Figure(data=data, layout=layout)
     py.plot(fig, filename = 'phone-line')
+
+    #
+    # trace1 = go.Scatter(  #lmao figure out what this does in documentation
+    #     type='scatter',
+    #     x=[x[0] for x in plotlytuplist],
+    #     y=[x[1] for x in plotlytuplist],
+    #     marker=dict(
+    #         color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
+    #         size=10
+    #     ),
+    #     line=dict(
+    #         color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
+    #         width=4
+    #     ),
+    #     mode='markers+lines'
+    # )
+    # data = [trace1]
+    #
+    # layout = go.Layout(
+    #     title="phone stuff",
+    #     xaxis = dict(
+    #         range=len(plotlytuplist)
+    #     ),
+    #     yaxis = dict(
+    #         range=[0, 10]
+    #     ),
+    #     height=500,
+    #     width=1000
+    # )
+    #
+    # fig = go.Figure(data=data, layout=layout)
+    # py.plot(fig, filename = 'phone-line')
+#process_command()
+
+
+    # trace2 = go.Bar(  #lmao figure out what this does in documentation
+    #     type='bar',
+    #     x=[x[0] for x in plotlytuplist],
+    #     y=[x[1] for x in plotlytuplist],
+    #     marker=dict(
+    #         color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
+    #         line=dict(
+    #             color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
+    #             width=1.5
+    #             )
+    #     )
+    # )
+    # data = [trace2]
+    # layout = go.Layout(
+    #     title="bar of ram figures",
+    #     xaxis = dict(
+    #         range=len(plotlytuplist)
+    #     ),
+    #     yaxis = dict(
+    #         range=[0, 10]
+    #     ),
+    #     height=700,
+    #     width=1500
+    # )
+    #
+    # fig = go.Figure(data=data, layout=layout)
+    # py.plot(fig, filename = 'phone-line-bar')
 process_command()
 #plotly stuff??
 
