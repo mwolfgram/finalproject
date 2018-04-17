@@ -17,6 +17,8 @@ try:
 except:
     cache_html_data = {}
 
+class AtLeastOneClassIsDefined:
+    lol = 1234
 
 def get_data_using_cache(url):
     unique_key = url
@@ -120,7 +122,9 @@ def get_data_for_model(): #add (make, model): as params
                             continue
 
                     phone0list_tuple = (phone0list[0][0].split('"'), phone0list[1][0].split(' '), phone0list[1][1].split(' '), phone0list[2][0], phone0list[2][1])
-                    phone0tup = (phone0list_tuple[0][0], phone0list_tuple[1][0], phone0list_tuple[2][0], phone0list_tuple[3], phone0list_tuple[-1])
+                    isolateint = str(phone0list_tuple[-1].split(',')[-1])
+                    phone0tup = (phone0list_tuple[0][0], phone0list_tuple[1][0], phone0list_tuple[2][0], phone0list_tuple[3], int(isolateint.split('MHz')[0]))
+                    #print(phone0tup)
 
                     ##########
                     phone_info1 = phonesoup.find(class_ = 'morespecs') #RAM, memory, battery
@@ -146,8 +150,11 @@ def get_data_for_model(): #add (make, model): as params
                                 dropdate = (x.split(':')[-1])
 
                         except:
-                            continue
+                            dropdate = None
+
                     phone2tup = dropdate
+                    if "," not in phone2tup:
+                        phone2tup = None
                     ##########
                     phone_info3 = phonesoup.find(class_ = 's_lv_1 field-500') #pixel density
                     for x in phone_info3:
@@ -165,10 +172,38 @@ def get_data_for_model(): #add (make, model): as params
                         except:
                             continue
                     phone4tup = screenratio
+                    ##########
+                    phone_info5 = phonesoup.find(class_ = 's_lv_1 field-450') #price attempt
+                    try:
+                        for x in phone_info5:
+                            try:
+                                #print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+                                price = x.text
+                                #print(price)
+                                # if 'MSRP' in price:
+                                #     continue
+                                if '$' in price:
+                                    dollar_fig = int(price.split('$')[-1])   #wait set the else statement to none if $ isn't in there
+                                    #print(dollar_fig)
+                                else:
+                                    continue
 
-                    tup234 = (phone2tup, phone3tup, phone4tup)
+                                #print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+                            except:
+                                continue
+                        phone5tup = dollar_fig
+                    except:
+                        try:
+                            phone_info5 = phonesoup.find(class_ = 'price') #price attempt
+                            presplit = phone_info5.text.split('$')[1]
+                            postsplit = int(presplit.split(' ')[0])
+                            phone5tup = postsplit
+                        except:
+                            phone5tup =  None
 
-                    final_phonetup = phone0tup + phone1tup + tup234
+                    tup2345 = (phone2tup, phone3tup, phone4tup, phone5tup)
+
+                    final_phonetup = phone0tup + phone1tup + tup2345
                     #print(final_phonetup)       #then pair this data to the phone name as well as brand!!!! put this into the db
                     master_dict[phone_key_name] = final_phonetup
 
@@ -187,35 +222,36 @@ def get_data_for_model(): #add (make, model): as params
 
     #------------------------------------------------------------- formation of mobile table -------------------------------------------------------------
 
-        statement = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'mobile';"
+        statement = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'mobiledata';"
         table_exists = cur.execute(statement).fetchall()[0][0]
         if table_exists == 1:
             #user_input = input('this table already exists -- reset it by typing yes to and start fresh?')
             user_input = 'yes'
             if user_input == 'yes':
                 statement = '''
-                    DROP TABLE IF EXISTS 'mobile';
+                    DROP TABLE IF EXISTS 'mobiledata';
                 '''
                 cur.execute(statement)
                 conn.commit()
 
                 statement = '''
-                    CREATE TABLE 'mobile' (
+                    CREATE TABLE 'mobiledata' (
                         'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
                         'brand' TEXT NOT NULL,
                         'brandId' INTEGER NOT NULL,
                         'model' TEXT NOT NULL,
-                        'screensize' TEXT NOT NULL,
+                        'screen size' INTEGER NOT NULL,
                         'rear camera (megapixels)' INTEGER NOT NULL,
                         'front camera (megapixels)' INTEGER NOT NULL,
                         'chip type' TEXT NOT NULL,
-                        'chip cores, mhz' TEXT NOT NULL,
-                        'ram size' INTEGER,
-                        'memory size' INTEGER,
-                        'battery size' INTEGER,
-                        'release date' TEXT NOT NULL,
+                        'processing speed (MHz)' INTEGER NOT NULL,
+                        'ram size (gb)' INTEGER,
+                        'storage size (gb)' INTEGER,
+                        'battery size (mAh)' INTEGER,
+                        'release date' TEXT,
                         'pixel density (ppi)' INTEGER,
-                        'screen-body ratio' INTEGER
+                        'screen-body ratio' INTEGER,
+                        'price' INTEGER
                     );
                 '''
                 cur.execute(statement)
@@ -225,22 +261,23 @@ def get_data_for_model(): #add (make, model): as params
                 return
         else:
             statement = '''
-                CREATE TABLE 'mobile' (
+                CREATE TABLE 'mobiledata' (
                     'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
                     'brand' TEXT NOT NULL,
                     'brandId' INTEGER NOT NULL,
                     'model' TEXT NOT NULL,
-                    'screensize' TEXT NOT NULL,
+                    'screen size' INTEGER NOT NULL,
                     'rear camera (megapixels)' INTEGER NOT NULL,
                     'front camera (megapixels)' INTEGER NOT NULL,
                     'chip type' TEXT NOT NULL,
-                    'chip cores, mhz' TEXT NOT NULL,
-                    'ram size' INTEGER,
-                    'memory size' INTEGER,
-                    'battery size' INTEGER,
-                    'release date' TEXT NOT NULL,
+                    'processing speed (MHz)' INTEGER NOT NULL,
+                    'ram size (gb)' INTEGER,
+                    'storage size (gb)' INTEGER,
+                    'battery size (mAh)' INTEGER,
+                    'release date' TEXT,
                     'pixel density (ppi)' INTEGER,
-                    'screen-body ratio' INTEGER
+                    'screen-body ratio' INTEGER,
+                    'price' INTEGER
                 );
             '''
             cur.execute(statement)
@@ -273,10 +310,11 @@ def get_data_for_model(): #add (make, model): as params
                 eleven = super_master_dict[brand_name][phone][8]
                 twelve = super_master_dict[brand_name][phone][9]
                 thirteen = super_master_dict[brand_name][phone][10]
+                fourteen = super_master_dict[brand_name][phone][11]
 
-                insertion = (zero, one, brand_fkey, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen)
-                statement = 'INSERT OR IGNORE INTO "mobile"'
-                statement += 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                insertion = (zero, one, brand_fkey, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen)
+                statement = 'INSERT OR IGNORE INTO "mobiledata"'
+                statement += 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
                 cur.execute(statement, insertion)
                 conn.commit()
 
@@ -324,7 +362,7 @@ def get_data_for_model(): #add (make, model): as params
             conn.commit()
 
 
-#get_data_for_model()
+get_data_for_model()
 
 
 def process_command():   #add a param in later -- command!!
@@ -338,135 +376,133 @@ def process_command():   #add a param in later -- command!!
     query = "SELECT * FROM mobile"   #mobile is the same name as mobile.db -- be careful here!!
     cur.execute(query)
 
-    # basicphone ='''
-    # SELECT mobile.brand, AVG(`ram size`)
-    # FROM mobile
-	# JOIN `foreign keys`
-	#    ON `foreign keys`.Id = brandfkey
-    # GROUP BY mobile.brand
-    # ORDER BY AVG(`ram size`) DESC
-    # '''  #put the .format here eventually
+    #plotly .format test
 
-    # #this changes what is displayed!!
-    # basicphone ='''
-    # SELECT mobile.model, `ram size`
-    # FROM mobile
-	# JOIN `foreign keys`
-	# ON `foreign keys`.Id = brandId
-    # ORDER BY `ram size` DESC
-    # '''  #put the .format here eventually
+    test_user_input = input('pls say bar or scatter: ')
 
-    #this changes what is displayed!!
-    basicphone ='''
-    SELECT mobile.model, `pixel density (ppi)`
-    FROM mobile
-	JOIN `foreign keys`
-	ON `foreign keys`.Id = brandId
-    ORDER BY `pixel density (ppi)` DESC
-    '''  #put the .format here eventually
+#okay i guess make a separate parts of the function with separate configurable sql statments inside of each
+    if 'scatter' in test_user_input:
+        #this changes what is displayed!!
+        basicphone ='''
+        SELECT mobile.model, `pixel density (ppi)`
+        FROM mobile
+    	JOIN `foreign keys`
+    	ON `foreign keys`.Id = brandId
+        ORDER BY `pixel density (ppi)` DESC
+        '''  #put the .format here eventually
 
-    strphone=str(basicphone)
-    cur.execute(strphone)
-    plotlytuplist = []
-    for row in cur:
-        pair = (row[0], (int(row[1])) if int(row[1]) > 5 else round(float(row[1]), 1))
-        plotlytuplist.append(pair)
-    print(plotlytuplist)
+        strphone=str(basicphone)
+        cur.execute(strphone)
+        plotlytuplist = []
+        for row in cur:
+            pair = (row[0], (int(row[1])) if int(row[1]) > 5 else round(float(row[1]), 1))  #change this depending!!!
+            plotlytuplist.append(pair)
+        print(plotlytuplist)
+
+        title_based_on_input = 'pixel densities!!'
+
+        range1 = (165, 538)
+        range2 = (100, 600)
+        height1 = 500
+        width1 = 1000
+        height2 = 600
+        width2 = 1100
+
+        trace1 = go.Scatter(  #***THIS IS THE SCATTER FOR PIXEL DENSITY BC EVERYTHING IS HUGE***      #.format bar or scatter here?
+            type='scatter', #format here for bar or scatter!
+            x=[x[0] for x in plotlytuplist],  #this will remain the same
+            y=[x[1] for x in plotlytuplist],
+            marker=dict(
+                color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
+                size=10
+            ),
+            line=dict(
+                color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
+                width=4
+            ),
+            mode='markers+lines' #what does this do???
+        )
+        data = [trace1]
+
+        layout = go.Layout(
+            title="{}".format(title_based_on_input), #.format the title based on the user input here
+            xaxis = dict(
+                range=len(plotlytuplist)
+            ),
+            yaxis = dict(
+                range=[range1[0], range1[1]]# change the range depending on what is being shown!
+            ),
+            height= height1, #as with this
+            width=width1 #and this
+        )
+
+        fig = go.Figure(data=data, layout=layout)
+        py.plot(fig, filename = 'phone-scatter')#change filename??
+
+    if 'bar' in test_user_input:
+
+        # SELECT mobile.brand, AVG(`screensize`)  #put different brand average features in here with .format!!!
+        # FROM mobile
+        # JOIN `foreign keys` as f
+        # ON mobile.brandId = f.Id
+        # GROUP BY mobile.brand
+
+        basicphone ='''
+        SELECT mobile.brand, AVG(`ram size`)
+        FROM mobile
+    	JOIN `foreign keys`
+    	   ON `foreign keys`.Id = brandId
+        GROUP BY mobile.brand
+        ORDER BY AVG(`ram size`) DESC
+        '''  #put the .format here eventually
+
+        strphone=str(basicphone)
+        cur.execute(strphone)
+        plotlytuplist = []
+        for row in cur:
+            pair = (row[0], (int(row[1])) if int(row[1]) > 5 else round(float(row[1]), 1))
+            plotlytuplist.append(pair)
+        print(plotlytuplist)
 
 
-    trace1 = go.Scatter(  #***THIS IS THE SCATTER FOR PIXEL DENSITY BC EVERYTHING IS HUGE***
-        type='scatter',
-        x=[x[0] for x in plotlytuplist],
-        y=[x[1] for x in plotlytuplist],
-        marker=dict(
-            color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
-            size=10
-        ),
-        line=dict(
-            color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
-            width=4
-        ),
-        mode='markers+lines'
-    )
-    data = [trace1]
+        title_based_on_input = 'ram bar chart!!'
 
-    layout = go.Layout(
-        title="phone stuff",
-        xaxis = dict(
-            range=len(plotlytuplist)
-        ),
-        yaxis = dict(
-            range=[165, 538]
-        ),
-        height=500,
-        width=1000
-    )
+        range1 = (0, 10) #proper
+        range2 = (1, 12)
+        height1 = 700 #proper
+        width1 = 1500
+        height2 = 600
+        width2 = 1100
 
-    fig = go.Figure(data=data, layout=layout)
-    py.plot(fig, filename = 'phone-line')
 
-    #
-    # trace1 = go.Scatter(  #lmao figure out what this does in documentation
-    #     type='scatter',
-    #     x=[x[0] for x in plotlytuplist],
-    #     y=[x[1] for x in plotlytuplist],
-    #     marker=dict(
-    #         color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
-    #         size=10
-    #     ),
-    #     line=dict(
-    #         color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
-    #         width=4
-    #     ),
-    #     mode='markers+lines'
-    # )
-    # data = [trace1]
-    #
-    # layout = go.Layout(
-    #     title="phone stuff",
-    #     xaxis = dict(
-    #         range=len(plotlytuplist)
-    #     ),
-    #     yaxis = dict(
-    #         range=[0, 10]
-    #     ),
-    #     height=500,
-    #     width=1000
-    # )
-    #
-    # fig = go.Figure(data=data, layout=layout)
-    # py.plot(fig, filename = 'phone-line')
+        trace2 = go.Bar(  #lmao figure out what this does in documentation
+            type='bar',
+            x=[x[0] for x in plotlytuplist],
+            y=[x[1] for x in plotlytuplist],
+            marker=dict(
+                color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
+                line=dict(
+                    color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
+                    width=1.5
+                    )
+            )
+        )
+        data = [trace2]
+        layout = go.Layout(
+            title="{}".format(title_based_on_input),
+            xaxis = dict(
+                range=len(plotlytuplist)
+            ),
+            yaxis = dict(
+                range=[range1[0], range1[1]]
+            ),
+            height= height1,
+            width= width1
+        )
+
+        fig = go.Figure(data=data, layout=layout)
+        py.plot(fig, filename = 'phone-bar')
 #process_command()
-
-
-    # trace2 = go.Bar(  #lmao figure out what this does in documentation
-    #     type='bar',
-    #     x=[x[0] for x in plotlytuplist],
-    #     y=[x[1] for x in plotlytuplist],
-    #     marker=dict(
-    #         color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
-    #         line=dict(
-    #             color=['rgb({},{},{})'.format(random.randint(0, 200), random.randint(0, 200), random.randint(0, 200)) for x in plotlytuplist],
-    #             width=1.5
-    #             )
-    #     )
-    # )
-    # data = [trace2]
-    # layout = go.Layout(
-    #     title="bar of ram figures",
-    #     xaxis = dict(
-    #         range=len(plotlytuplist)
-    #     ),
-    #     yaxis = dict(
-    #         range=[0, 10]
-    #     ),
-    #     height=700,
-    #     width=1500
-    # )
-    #
-    # fig = go.Figure(data=data, layout=layout)
-    # py.plot(fig, filename = 'phone-line-bar')
-process_command()
 #plotly stuff??
 
 
