@@ -712,6 +712,10 @@ def interactive_prompt():
     while response.lower() != 'exit':
         response = input('hi! enter a command, type help for a list of commands, or exit: ')
 
+        if response.lower() == 'help':
+            print(help_text)
+            continue
+
         if response.lower() == 'exit':
             print('boi bye')
             break
@@ -727,16 +731,17 @@ def interactive_prompt():
         table_exists = cur.execute(statement1).fetchall()[0][0]
         if table_exists == 1:
             user_input = input('the information you need is already here! would you like to regenerate it? type "yes" or "no": ')
+
             if user_input == 'yes':
                 print('getting new data -- this will take 5 to 30 minutes')
                 fetch_data_pls()
+
             if user_input == 'no':
                 print('okay, we will keep using the existing database')
+
             if response.lower() == 'exit':
                 print('boi bye')
                 break
-            else:
-                print('type "yes" or "no":')
 
         else:
             print('the table you need does not exist -- it will be generated again! this will take 5 to 30 minutes')
@@ -760,12 +765,11 @@ def interactive_prompt():
                 print('your graph command was not processed correctly')
 
         if response.lower() == 'help':
-            print('AAAAAAAAAAAAAAAAAAA')
             print(help_text)
             #continue
 
         if response.lower() == 'exit':
-            print('boi bye')
+            print('bye!')
             break
 
         # else:  #this prints at the end bc response is set to = ''
@@ -773,14 +777,6 @@ def interactive_prompt():
 
 #should u do anything with cache deletion??
 
-
-
-#part 2 -- generate two tables that cature the data returned by the phonearena website
-
-
-
-#part 3 -- implement interactive setup to take user input and return the data, ask for poltly graphs
-    #would you like to generate a grpah of distribution of...
 
 
 #part 4 -- test cases
