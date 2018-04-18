@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import plotly.plotly as py
 import plotly.graph_objs as go
 import random
-import os #????
+#import os #maybe for deleting cache file later??
 
 brand_input_dict = {}
 
@@ -69,7 +69,7 @@ def get_data_for_model(): #add (make, model): as params
             else:
                 printStr1 += "{0:17}\t".format(x)
                 numsInRow1 += 1
-        print(printStr1)
+        #print(printStr1)
         return brand_input_dict
 
         #then, show them the available models and ask them to pick one to get details on -- make table of all phone from the device after getting the info for it?
@@ -88,7 +88,7 @@ def fetch_data_pls(test_inp0 = None):
             #print(brand_input_dict)
         else:
             brand_input_dict = dict_results
-            print(brand_input_dict)
+            #print(brand_input_dict)
 
         for comp in brand_input_dict.keys():
 
@@ -126,7 +126,7 @@ def fetch_data_pls(test_inp0 = None):
                 try:
                     #print('----------------------')
                     phone_key_name = x
-                    print(x)
+                    #print(x)
                     phonelink = 'https://www.phonearena.com' + model_dict[x] #fill this with user model input, this is the crawling part
                     #print(phonelink)
                     a_phone = get_data_using_cache(phonelink)
@@ -420,7 +420,7 @@ def process_command(test_inp = None):   #add a param in later -- command!! what 
 
     #what to do if none type? will it ever be?
     command =  str(test_inp.lower()) + ' '
-    print(command)
+    #print(command)
     # while command.lower() != 'exit':                  #change this later!!!
     #     command = input('pls say bar or scatter: ')
 
@@ -621,6 +621,8 @@ def process_command(test_inp = None):   #add a param in later -- command!! what 
     except:
         print('your command was not recognized -- please try again!!')
         #continue #no loop with interactive_prompt???
+    if test_inp is not None:
+        return plotlytuplist
 
 #---------------------------------------------------------------- making scatterplot ----------------------------------------------------------------
     if 'scatter ' in command:

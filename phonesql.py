@@ -282,6 +282,5 @@ def process_command():   #add a param in later -- command!!
                 print('an error was made while generating your bar graph')
 
 
-#make separate interactive_prompt thing again?? just try passing stuff through for now
 
 process_command()
