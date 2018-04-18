@@ -194,10 +194,10 @@ def process_command():   #add a param in later -- command!!
                     ORDER BY {} DESC
             '''.format(mobiledata_format, master_piece, group_by_opt, master_piece)
 
-            print('-------------------------------------------------------')
-            print(basic_sql_amalg)
-            print(title_from_input, range_graph)
-            print('-------------------------------------------------------')
+            # print('-------------------------------------------------------')
+            # print(basic_sql_amalg)
+            # print(title_from_input, range_graph)
+            # print('-------------------------------------------------------')
 
             strphone=str(basic_sql_amalg)
             cur.execute(strphone)
@@ -213,7 +213,7 @@ def process_command():   #add a param in later -- command!!
                     else:
                         continue
 
-            print(plotlytuplist)
+            #print(plotlytuplist)
         except:
             print('your command was not recognized -- please try again!!')
             continue
@@ -282,5 +282,6 @@ def process_command():   #add a param in later -- command!!
                 print('an error was made while generating your bar graph')
 
 
+#make separate interactive_prompt thing again?? just try passing stuff through for now
 
 process_command()
