@@ -2,7 +2,7 @@
 using this program requires typing a combination of primary, secondary, and tertiary commands.
 a guide to these commands has been provided for you below!
 
-*THE PROGRAM WILL NOT WORK IF COMMANDS AREN'T TYPED AS SPECIFIED*
+*THE PROGRAM WILL NOT WORK IF COMMANDS AREN'T TYPED EXACTLY AS SPECIFIED*
 
 commands available:
 
@@ -15,11 +15,11 @@ scatter:
 
 
 ********************** secondary commands (metrics) **********************
-screen size // generates the graph based on the screen size of all phones
+screen-size // generates the graph based on the screen size of all phones
 
-front cam // generates the graph based on the sizes of the front camera sensor of all phones
+front-cam // generates the graph based on the sizes of the front camera sensor of all phones
 
-rear cam // generates the graph based on the sizes of the rear camera sensor of all phones
+rear-cam // generates the graph based on the sizes of the rear camera sensor of all phones
 
 processor // generates the graph based on the processor sizes (in megahertz) of all phones
 
@@ -29,13 +29,13 @@ storage // generates the graph based on the amount of storage (gb) in all phones
 
 battery // generates the graph based on the battery size of all phones
 
-pixel density // generates the graph based on the pixel densities (in pixels per inch) of all phones
+pixel-density // generates the graph based on the pixel densities (in pixels per inch) of all phones
 
 screen-body // generates the graph based on the screen-body ratios of all phones
 
 price // generates the graph based on the prices of all phones
 
-************************ tertiary command (brands) ************************
+******************** tertiary command (average by brands) ********************
 brand // generates the specified graph by calculating the average value of the specified 
 metric for each brand—the brands and their average values are then displayed 
 

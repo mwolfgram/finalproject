@@ -1,124 +1,62 @@
 import unittest
-from moreint import *
+from finalproject import *
 
-# finalprojtests.py
 
-class TestDatabase(unittest.TestCase):
+class testcollection(unittest.TestCase):
 
-    def test_mobile_table(self):
+    def test_collection(self):
         test0 = process_command('bar ram')
-        #print(test0)
         self.assertGreater(len(test0), 0)
         self.assertEqual(test0[-1][-1], .2)
 
-    def test_fetch(self):   #get rid of the print statements!!!
-        test1 = fetch_data_pls('apple')
-        #print(test1)
-        test2 = fetch_data_pls('samsung')
-        #print('-----------------------')
-        #print(test2)
+        test1 = process_command('scatter battery brand')
+        self.assertGreater(len(test0), 0)
+        self.assertEqual(test1[-1][-1], 1300)
+        self.assertEqual(test1[-1][0], 'fusion garage')
 
-        self.assertGreater(len(test1), 0)
-        self.assertTrue('apple' in test1.keys())
+class testfetch(unittest.TestCase):
+
+    def test_fetch(self):
+        test2 = fetch_data('apple')
         self.assertGreater(len(test2), 0)
-        self.assertTrue('samsung' in test2.keys())   #is it not a dictionary with samsung??
-        #other test case ideas -- types of values??
-        #lengths of tuples? make sure all info is captured??
+        self.assertTrue('apple' in test2.keys())
 
+        test3 = fetch_data('samsung')
+        self.assertGreater(len(test3), 0)
+        self.assertTrue('samsung' in test3.keys())
 
-#
-#     def test_country_table(self):
-#         conn = sqlite3.connect(DBNAME)
-#         cur = conn.cursor()
-#
-#         sql = '''
-#             SELECT EnglishName
-#             FROM Countries
-#             WHERE Region="Oceania"
-#         '''
-#         results = cur.execute(sql)
-#         result_list = results.fetchall()
-#         self.assertIn(('Australia',), result_list)
-#         self.assertEqual(len(result_list), 27)
-#
-#         sql = '''
-#             SELECT COUNT(*)
-#             FROM Countries
-#         '''
-#         results = cur.execute(sql)
-#         count = results.fetchone()[0]
-#         self.assertEqual(count, 250)
-#
-#         conn.close()
-#
-#     def test_joins(self):
-#         conn = sqlite3.connect(DBNAME)
-#         cur = conn.cursor()
-#
-#         sql = '''
-#             SELECT Alpha2
-#             FROM Bars
-#                 JOIN Countries
-#                 ON Bars.CompanyLocationId=Countries.Id
-#             WHERE SpecificBeanBarName="Hacienda Victoria"
-#                 AND Company="Arete"
-#         '''
-#         results = cur.execute(sql)
-#         result_list = results.fetchall()
-#         self.assertIn(('US',), result_list)
-#         conn.close()
-#
-# class TestBarSearch(unittest.TestCase):
-#
-#     def test_bar_search(self):
-#         results = process_command('bars ratings top=1')
-#         self.assertEqual(results[0][0], 'Chuao')
-#
-#         results = process_command('bars cocoa bottom=10')
-#         self.assertEqual(results[0][0], 'Guadeloupe')
-#
-#         results = process_command('bars sellcountry=CA ratings top=5')
-#         self.assertEqual(results[0][3], 4.0)
-#
-#         results = process_command('bars sourceregion=Africa ratings top=5')
-#         self.assertEqual(results[0][3], 4.0)
-#
-#
-# class TestCompanySearch(unittest.TestCase):
-#
-#     def test_company_search(self):
-#         results = process_command('companies region=Europe ratings top=5')
-#         self.assertEqual(results[1][0], 'Idilio (Felchlin)')
-#
-#         results = process_command('companies country=US bars_sold top=5')
-#         self.assertTrue(results[0][0] == 'Fresco' and results[0][2] == 26)
-#
-#         results = process_command('companies cocoa top=5')
-#         self.assertEqual(results[0][0], 'Videri')
-#         self.assertGreater(results[0][2], 0.79)
-#
-# class TestCountrySearch(unittest.TestCase):
-#
-#     def test_country_search(self):
-#         results = process_command('countries sources ratings bottom=5')
-#         self.assertEqual(results[1][0],'Uganda')
-#
-#         results = process_command('countries sellers bars_sold top=5')
-#         self.assertEqual(results[0][2], 764)
-#         self.assertEqual(results[1][0], 'France')
-#
-#
-# class TestRegionSearch(unittest.TestCase):
-#
-#     def test_region_search(self):
-#         results = process_command('regions sources bars_sold top=5')
-#         self.assertEqual(results[0][0], 'Americas')
-#         self.assertEqual(results[3][1], 66)
-#         self.assertEqual(len(results), 4)
-#
-#         results = process_command('regions sellers ratings top=10')
-#         self.assertEqual(len(results), 5)
-#         self.assertEqual(results[0][0], 'Oceania')
-#         self.assertGreater(results[3][1], 3.0)
+        test4 = fetch_data('motorola')
+        self.assertGreater(len(test4), 0)
+        self.assertTrue('motorola' in test4.keys())
+
+class testdatabase(unittest.TestCase):
+
+    def test_database(self):
+        conn = sqlite3.connect('mobile.db')
+        cur = conn.cursor()
+
+        sql = '''
+            SELECT mobiledata.brand, AVG(`ram size (gb)`)
+                FROM mobiledata
+                JOIN `foreign keys` as f
+                ON mobiledata.brandId = f.Id
+                GROUP BY mobiledata.brand
+                ORDER BY AVG(`ram size (gb)`) DESC
+        '''
+        results = cur.execute(sql)
+        result_list = results.fetchall()
+        self.assertIn('razer', result_list[0][0])
+        self.assertIn('niu', result_list[-1][0])
+        self.assertGreater(len(result_list), 60)
+
+        sql = '''
+            SELECT COUNT(*)
+            FROM mobiledata
+        '''
+        results = cur.execute(sql)
+        count = results.fetchone()[0]
+        self.assertGreater(count, 900)
+
+        conn.close()
 
 unittest.main()
