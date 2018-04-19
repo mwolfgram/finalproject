@@ -580,7 +580,7 @@ def load_help_text():
         return f.read()
 
 def interactive_prompt():
-    factors = ['screen-size', 'front-cam', 'rear-cam', 'processor', 'ram', 'storage', 'battery', 'pixel-density', 'screen-body', 'price']
+    factors = ['screen-size', 'front-cam', 'rear-cam', 'processor', 'ram', 'storage', 'battery', 'pixel-density', 'screen-body', 'price' ]
     help_text = load_help_text()
 
     response = ''
@@ -605,49 +605,40 @@ def interactive_prompt():
 
         try:
             if 'bar' or 'scatter' in response.lower():
-                bool1 = 'bar' in response.lower()
-                bool2 = 'scatter' in response.lower()
-                tupbool = (bool1, bool2)
+                if response.lower().split()[1] in factors:
+                    try:
+                        statement1 = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'mobiledata';"
+                        table_exists = cur.execute(statement1).fetchall()[0][0]
+                        if table_exists == 1:
+                            user_input = input('the information you need is already here! would you like to regenerate it? type "yes" or "no" or "exit": ')
 
-                if tupbool != (False, False):
+                            if user_input.lower() == 'yes':
+                                print('getting new data -- this will take 5 to 30 minutes')
+                                try:
+                                    fetch_data()
+                                    process_command(below_response)
+                                except:
+                                    print('command not recognized :(')
+                                continue
 
-                    if response.lower().split()[1] in factors:
-                        try:
-                            statement1 = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'mobiledata';"
-                            table_exists = cur.execute(statement1).fetchall()[0][0]
-                            if table_exists == 1:
-                                user_input = input('the information you need is already here! would you like to regenerate it? type "yes" or "no" or "exit": ')
-
-                                if user_input.lower() == 'yes':
-                                    print('getting new data -- this will take 5 to 30 minutes')
-                                    try:
-                                        fetch_data()
-                                        process_command(below_response)
-                                    except:
-                                        print('command not recognized :(')
+                            if user_input.lower() == 'no':
+                                try:
+                                    print('okay, we will keep using the existing database')
+                                    process_command(below_response)
+                                    continue
+                                except:
+                                    print('command not recognized :(')
                                     continue
 
-                                if user_input.lower() == 'no':
-                                    try:
-                                        print('okay, we will keep using the existing database')
-                                        process_command(below_response)
-                                        continue
-                                    except:
-                                        print('command not recognized :(')
-                                        continue
+                            if user_input.lower() == 'exit':
+                                print('bye!')
+                                break
 
-                                if user_input.lower() == 'exit':
-                                    print('bye!')
-                                    break
-
-                            else:
-                                print('the table you need does not exist -- it will be generated again! this will take 5 to 30 minutes')
-                                fetch_data()
-                                process_command(below_response)
-                        except:
-                            print('please enter a valid command')
-                            continue
-                    else:
+                        else:
+                            print('the table you need does not exist -- it will be generated again! this will take 5 to 30 minutes')
+                            fetch_data()
+                            process_command(below_response)
+                    except:
                         print('please enter a valid command')
                         continue
                 else:
