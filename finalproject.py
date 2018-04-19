@@ -17,8 +17,6 @@ try:
 except:
     cache_html_data = {}
 
-class AtLeastOneClassIsDefined:
-    lol = 1234
 
 def get_data_using_cache(url):
     unique_key = url
@@ -494,16 +492,26 @@ def process_command(test_inp = None):
         strphone=str(basic_sql_amalg)
         cur.execute(strphone)
         plotlytuplist = []
+        my_objects = []
+
+        class MyEntity:
+            def __init__(self, init_tuple):  
+                self.item0 = init_tuple[0]
+                self.item1 = int(init_tuple[1]) if int(init_tuple[1]) > 5 else round(float(init_tuple[1]), 1)
+
         for row in cur:
             try:
-                pair = (row[0], (int(row[1])) if int(row[1]) > 5 else round(float(row[1]), 1))
-                plotlytuplist.append(pair)
+                my_objects.append(MyEntity(row))
             except:
                 if row[1] is not None:
-                    pair = (row[0], row[1])
-                    plotlytuplist.append(pair)
+                    row = (row[0], row[1])
+                    my_objects.append(MyEntity(row))
                 else:
                     continue
+
+        for x in my_objects:
+            pair = (x.item0, x.item1)
+            plotlytuplist.append(pair)
 
     except:
         print('your command was not recognized -- please try again!!')
