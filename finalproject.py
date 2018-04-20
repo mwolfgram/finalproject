@@ -495,7 +495,7 @@ def process_command(test_inp = None):
         my_objects = []
 
         class MyEntity:
-            def __init__(self, init_tuple):  
+            def __init__(self, init_tuple):
                 self.item0 = init_tuple[0]
                 self.item1 = int(init_tuple[1]) if int(init_tuple[1]) > 5 else round(float(init_tuple[1]), 1)
 

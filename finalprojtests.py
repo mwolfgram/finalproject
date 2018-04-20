@@ -12,7 +12,7 @@ class testcollection(unittest.TestCase):
         test1 = process_command('scatter battery brand')
         self.assertGreater(len(test0), 0) #ensures the user command is processed correctly
         self.assertEqual(test1[-1][-1], 1300) #ensures relevant data is returned from process_command based on the user command
-        self.assertEqual(test1[-1][0], 'fusion garage') #ensures the process_command function correctly populates information per brand 
+        self.assertEqual(test1[-1][0], 'fusion garage') #ensures the process_command function correctly populates information per brand
 
 class testfetch(unittest.TestCase):
 
