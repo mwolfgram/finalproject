@@ -73,8 +73,11 @@ The code is structured around three main functions:
         
   - these commands must be typed correctly in order to generate the plotly graphs!
   - **WITHOUT THE CACHE, DATA COLLECTION TAKES UPWARDS OF THIRTY MINUTES**
-    download the cache to reduce long load times to a few minutes -- https://drive.google.com/open?id=1UDZwmwFXaeOjwHEfFW4RIytvN4Tu8n3r
-    data can be gathered without the cache, but at the loss of a significant amount of your precious time on earth 
+    download the cache to reduce long load times to a few minutes—download it here:
+    
+    https://drive.google.com/openid=1UDZwmwFXaeOjwHEfFW4RIytvN4Tu8n3r
+    
+  - data can be gathered without the cache, but at the loss of a significant amount of your precious time on earth 
   - **THE CACHE IS VERY LARGE AND NOT INCLUDED IN THE REPO—IT MUST BE DOWNLOADED FROM GOOGLE DRIVE**
     
     
