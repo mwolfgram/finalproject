@@ -75,7 +75,7 @@ The code is structured around three main functions:
         
   - these commands must be typed correctly in order to generate the plotly graphs!
   - **WITHOUT THE CACHE, DATA COLLECTION TAKES UPWARDS OF THIRTY MINUTES**
-    download the cache to reduce long load times to a few minutes—download it here:
+    the cache reduces long load times to a few minutes—download it here:
     
     https://drive.google.com/openid=1UDZwmwFXaeOjwHEfFW4RIytvN4Tu8n3r
     
