@@ -1,5 +1,5 @@
 # finalproject by matthew wolfgram
-- si 206 w '18
+si 206 w '18
 
 
 ******overview******
