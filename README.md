@@ -84,7 +84,7 @@ The code is structured around three main functions:
     
     
 ******requirements.txt******
-  - a virtual environment (inside folder finalprojmw) and its accompanying requirements.txt is included in this repository
+  - a requirements.txt is included in this repository
   
 	
 
