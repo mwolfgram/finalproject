@@ -8,20 +8,21 @@ my project crawls a website called phonearena (https://www.phonearena.com/phones
 
 ******instructions/flow******
 
-The initial page that contains the information needed for crawling is https://www.phonearena.com/phones/manufacturers — from there, the individual links of each brand are crawled, and information from the pages of each individual device (i.e. https://www.phonearena.com/phones/OPPO-F7_id10856 ) is scraped. For each phone, information about its screen size, front camera, rear camera, processor, ram, storage, battery, pixel density, screen-body ratio, and price are put into the mobile.db database.
+The initial page that contains the information needed for crawling is https://www.phonearena.com/phones/manufacturers — from there, the individual links of each brand are crawled, and information from the pages of each individual device (i.e. https://www.phonearena.com/phones/OPPO-F7_id10856 ) is scraped. For each phone, information about its **screen size, front camera, rear camera, processor, ram, storage, battery, pixel density, screen-body ratio, and price** are put into the mobile.db database.
 
 
 ******main functions/data structures******
 
 The code is structured around three main functions:
 -	fetch_data ():
-  -	caches the request data, and gathers the relevant information from the HTML of each phoe on https://www.phonearena.com/phones/manufacturers
-  -	populates dictionary super_master_dict that contains a dictionary of each brand, where each dictionary contains a 12-tuple for each phone by that brand. The12-tuple contains the model, screen size, front camera, rear camera, processor, ram, storage, battery, release date, pixel density, screen-body ratio, and price
-  -	after that, the database mobile.db is populated with a mobiledata table containing these values, mapping each phone to its manufacturer via an Id in the foreign keys table 
-  -	fetch_data() returns super_master_dict for the test cases 
+  -	caches the request data, and gathers the relevant information from the HTML of each phone on 
+  	https://www.phonearena.com/phones/manufacturers
+  -	populates dictionary **super_master_dict** that contains a dictionary of each brand, where each dictionary contains a 12-tuple for each phone by that brand. The 12-tuple contains the model, screen size, front camera, rear camera, processor, ram, storage, battery, release date, pixel density, screen-body ratio, and price
+  -	after that, the **database mobile.db** is populated with a mobiledata table containing these values, mapping each phone to its manufacturer via an Id in the foreign keys table 
+  -	fetch_data() **returns super_master_dict** for the test cases 
 -	process_command():
-  -	once the mobile.db is created, process_command() makes a connection to the database and constructs a SQL statement depending on the inputted user command it accepts as a parameter. After this statement is executed, the results are passed through the     class MyEntity that retrieves the information from the SQL output and populates the plotlytuplist— this list contains a 2-tuple that holds the name of the device and the specified metric. Each tuple is then graphed as either a bar graph or scatter plot. 
-  -	process_command() returns plotlytuplist for the test cases
+  -	once the mobile.db is created, process_command() makes a connection to the database and constructs a SQL statement depending on the inputted user command it accepts as a parameter. After this statement is executed, the results are passed through the **class MyEntity** that retrieves the information from the SQL output and populates the **plotlytuplist**— this list contains a 2-tuple that holds the name of the device and the specified metric. Each tuple is then graphed as either a bar graph or scatter plot. 
+  -	process_command() **returns plotlytuplist** for the test cases
 -	interactive_prompt():
   -	before the data collection processing is conducted, this function prompts the user to specify which information they would like to see displayed via plotly. It supports all of the commands in the help.txt file (see below).
   -	If the command is not supported, the user is prompted to enter another 
