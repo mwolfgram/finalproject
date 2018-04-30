@@ -83,8 +83,7 @@ The code is structured around three main functions:
   - **THE CACHE IS VERY LARGE AND NOT INCLUDED IN THE REPO—IT MUST BE DOWNLOADED FROM GOOGLE DRIVE**
     
     
-******requirements.txt******
-  - a virtual environment (inside folder finalprojmw) and its accompanying requirements.txt is included in this repository
+
   
 	
 
